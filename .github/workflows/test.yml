@@ -4,7 +4,7 @@ on: [push , pull_request]
 
 jobs:
   test:
-    run-on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
@@ -12,4 +12,4 @@ jobs:
           enable-cache: true
       - run: uv sync --frozen
       - run: uv run pytest -q
-
+      
