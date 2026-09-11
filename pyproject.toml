@@ -1,0 +1,35 @@
+[project]
+name = "rag-poc"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "alembic>=1.19.2",
+    "anthropic>=1.5.0",
+    "asyncpg>=0.31.0",
+    "bcrypt>=5.0.0",
+    "fastapi>=0.141.1",
+    "google-genai>=2.23.0",
+    "openai>=3.13.0",
+    "pdfplumber>=0.11.10",
+    "pydantic-settings>=2.15.0",
+    "pydantic[email]>=2.13.5",
+    "pyjwt>=2.13.0",
+    "pypdf>=6.18.0",
+    "python-docx>=1.2.0",
+    "python-multipart>=0.0.32",
+    "qdrant-client>=1.19.0",
+    "redis>=8.1.0",
+    "sentence-transformers>=6.0.1",
+    "slowapi>=0.1.10",
+    "sqlalchemy>=2.0.52",
+    "structlog>=26.1.0",
+    "tenacity>=9.1.4",
+    "tiktoken>=0.14.0",
+    "uvicorn>=0.52.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
