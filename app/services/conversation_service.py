@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy import func
 
-
 from app.config import settings
+from app.services.errors import ConversationNotFoundError
 from app.models import Conversation, Document, Message, MessageRole
 
 class ConversationService:
@@ -32,7 +32,9 @@ class ConversationService:
         if conversation_id:
             conv = await self.get_conversation(conversation_id, user_id)
             if not conv:
-                raise ValueError("Conversation not found")
+                raise ConversationNotFoundError("Conversation not found")     # ← was ValueError
+            return conv
+
             return conv
         conv = Conversation(user_id=user_id)
         self.db.add(conv)

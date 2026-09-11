@@ -17,6 +17,7 @@ from app.api.limiter import limiter
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
+from app.services.chat_service import ChatService, ChatError
 
 @router.post("/", response_model=ChatResponse)
 @limiter.limit("30/minute")
@@ -43,7 +44,7 @@ async def chat(
             model=body.model,
             provider=body.provider,
         )
-    except ValueError as e:
+    except ChatError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
     return ChatResponse(

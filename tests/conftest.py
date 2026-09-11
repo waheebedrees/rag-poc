@@ -1,6 +1,4 @@
-# ------------------------------------------------------------------
-# 1. Set test env vars FIRST — before any `from app...` import.
-# ------------------------------------------------------------------
+
 import os
 os.environ.setdefault("SECRET_KEY", "test-secret-key-at-least-32-chars-long")
 os.environ.setdefault("ALGORITHM", "HS256")
@@ -30,9 +28,7 @@ os.environ.setdefault("DEFAULT_LLM_PROVIDER", "openai")
 os.environ.setdefault("DEFAULT_LLM_MODEL", "gpt-4o-mini")
 os.environ.setdefault("ALLOWED_ORIGINS", '["http://localhost:3000"]')
 
-# ------------------------------------------------------------------
-# 2. Now import anything from app — settings will read the vars above.
-# ------------------------------------------------------------------
+
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -143,15 +139,15 @@ async def client(db, mock_blacklist):
     app.dependency_overrides[get_db] = _override_db
     app.dependency_overrides[get_blacklist] = lambda: mock_blacklist
 
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(
+        app=app, raise_app_exceptions=False)  
     try:
         async with AsyncClient(transport=transport, base_url="http://test") as c:
             yield c
     finally:
         app.dependency_overrides.pop(get_db, None)
         app.dependency_overrides.pop(get_blacklist, None)
-
-
+        
 @pytest_asyncio.fixture
 async def authed(client):
     """Register + login, return client with Authorization header set."""

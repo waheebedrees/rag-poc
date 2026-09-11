@@ -14,11 +14,11 @@ from app.utils.logger import get_logger
 from app.services.embeddings import get_embedding_service
 from app.prompts import SYSTEM_PROMPT
 from app.services.bm25_search import BM25SearchService
+from app.services.errors import ChatError, ConversationNotFoundError
 
 
 
 logger = get_logger(__name__)
-
 
 
 class ChatService:
@@ -134,17 +134,19 @@ class ChatService:
 
         security = self.security_filter.check_query(message)
         if not security.is_safe:
-            logger.warning("chat.query_blocked", rule=security.rule,
-                        preview=security.redacted[:200])
-            return {
-                "conversation_id": conversation_id,
-                "message": "I can't process this request.",
-                "reasoning": "Query failed security validation.",
-            }
+            logger.warning(
+                "chat.query_blocked rule=%s preview=%s",
+                security.rule,
+                security.redacted[:200],
+            )
+            raise ChatError("Query blocked by security filter")
 
-        conversation = await self.conv_service.get_or_create_conversation(
-            user_id, conversation_id
-        )
+        try:
+            conversation = await self.conv_service.get_or_create_conversation(
+                user_id, conversation_id
+            )
+        except ConversationNotFoundError as e:
+            raise ChatError(str(e)) from e
 
         user_msg = Message(
             conversation_id=conversation.id,
@@ -200,6 +202,7 @@ class ChatService:
                 "LLM call failed for conversation %s (user message already saved)",
                 conversation.id,
             )
+            
             raise       # caller sees 500; user question is on disk
 
         assistant_msg = Message(

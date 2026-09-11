@@ -107,8 +107,8 @@ class SourceReference(BaseModel):
     document_id: str 
     document_title: str 
     content_preview: str 
-    similarity_score: float 
-    
+    similarity_score: float | None = None  
+
 
 class MessageResponse(BaseModel):
     id: UUID
