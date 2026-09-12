@@ -61,6 +61,26 @@ def _assert_test_settings():
     )
 
 
+@pytest.fixture(autouse=True)
+def mock_qdrant(monkeypatch):
+    """Replace Qdrant with an in-memory client so chat tests don't hit the network."""
+    from app.services.vector_service import VectorService
+    from qdrant_client import AsyncQdrantClient
+
+    async def fake_ensure(self):
+        if self.qdrant_client is None:
+            self.qdrant_client = AsyncQdrantClient(":memory:")
+            await self.qdrant_client.create_collection(
+                collection_name=self._collection,
+                vectors_config=__import__("qdrant_client.models", fromlist=["VectorParams"]).VectorParams(
+                    size=self._dims, distance=__import__("qdrant_client.models", fromlist=[
+                                                         "Distance"]).Distance.COSINE
+                ),
+            )
+        return self.qdrant_client
+
+    monkeypatch.setattr(VectorService, "_ensure_client", fake_ensure)
+    
 @pytest.fixture
 def mock_blacklist():
     """In-memory TokenBlacklist stand-in with real add/contains semantics."""
