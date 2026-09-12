@@ -20,7 +20,8 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready" -U test -d test_knowledge_db
+          --health-cmd "pg_isready -U test -d test_knowledge_db"
+
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
