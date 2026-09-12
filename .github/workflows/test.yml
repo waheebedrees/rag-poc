@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 20
     services:
       qdrant:
-        image: qdrant/ddrant:latest
+        image: qdrant/qdrant:latest
         ports:
           - 6333:6333
           - 6334:6334
@@ -27,7 +27,7 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd "pg_isready -U test" --health-interval 5s --health-timeout 5s --health-retries 10
-        
+
     steps:
       - name: checkout
         uses: actions/checkout@v4
