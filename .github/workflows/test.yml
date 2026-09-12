@@ -1,15 +1,48 @@
 name: Tests
 
-on: [push , pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_knowledge_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready" -U test -d test_knowledge_db
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - name: checkout
+        uses: actions/checkout@v4
+      
+      - name: install uv
+        uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-      - run: uv sync --frozen
-      - run: uv run pytest -q
+
+      - name: install dependencies
+        run: uv sync --frozen
       
+      - name: Run tests
+        run: uv run pytest -v 
+        env:
+          SECRET_KEY: test-secret-key-at-least-32-chars-long
+          DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/test_knowledge_db
+          REDIS_URL: redis://localhost:6379/1
+          OPENAI_API_KEY: sk-test-fake
+          GOOGLE_API_KEY: fake
+          QDRANT_URL: http://localhost:6333
