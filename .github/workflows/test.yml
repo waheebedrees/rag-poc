@@ -20,8 +20,7 @@ jobs:
           POSTGRES_DB: test_knowledge_db
         ports:
           - 5432:5432
-        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
-
+        options: --health-cmd "pg_isready -U test" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - name: checkout
         uses: actions/checkout@v4
