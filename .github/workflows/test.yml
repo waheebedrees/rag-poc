@@ -1,3 +1,4 @@
+
 name: Tests
 
 on:
@@ -10,14 +11,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    services:
-      qdrant:
-        image: qdrant/qdrant:latest
-        ports:
-          - 6333:6333
-          - 6334:6334
-        options: --health-cmd "bash -c ':> /dev/tcp/127.0.0.1/6333'" --health-interval 5s --health-timeout 5s --health-retries 10
 
+    services:
       postgres:
         image: postgres:16-alpine
         env:
@@ -28,20 +23,27 @@ jobs:
           - 5432:5432
         options: --health-cmd "pg_isready -U test" --health-interval 5s --health-timeout 5s --health-retries 10
 
+      qdrant:
+        image: qdrant/qdrant:latest
+        ports:
+          - 6333:6333
+          - 6334:6334
+        options: --health-cmd "bash -c ':> /dev/tcp/127.0.0.1/6333'" --health-interval 5s --health-timeout 5s --health-retries 10
+
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      
+
       - name: install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
 
       - name: install dependencies
         run: uv sync --frozen
-      
+
       - name: Run tests
-        run: uv run pytest -v 
+        run: uv run pytest -v
         env:
           SECRET_KEY: test-secret-key-at-least-32-chars-long
           DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/test_knowledge_db
