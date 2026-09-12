@@ -10,6 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     services:
       postgres:
         image: postgres:16-alpine
@@ -21,25 +22,24 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd pg_isready
-
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
-      
-      - name: install uv
+
+      - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
 
-      - name: install dependencies
+      - name: Install dependencies
         run: uv sync --frozen
-      
+
       - name: Run tests
-        run: uv run pytest -v 
+        run: uv run pytest -v
         env:
           SECRET_KEY: test-secret-key-at-least-32-chars-long
           DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/test_knowledge_db
