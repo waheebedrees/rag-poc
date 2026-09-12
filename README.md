@@ -760,6 +760,7 @@ uv run pytest tests/ --cov=app --cov-report=term-missing
 | `test_text_extractor.py` | PDF, DOCX, TXT, CSV extraction, encoding fallback |
 | `test_text_splitter.py` | Chunk size, empty input, token counting |
 | `test_filters.py` | Injection detection, homoglyph bypass, secret blocking |
+| `test_chat.py` | RAG pipeline, context building, source citations |
 
 ---
 
