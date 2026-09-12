@@ -265,7 +265,6 @@ curl -X POST http://localhost:8000/api/v1/auth/register \
     "email": "user@example.com",
     "username": "myuser",
     "password": "MyPass123",
-    "full_name": "My Name"
   }'
 
 # Login

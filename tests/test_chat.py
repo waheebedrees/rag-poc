@@ -289,3 +289,5 @@ async def test_chat_llm_failure_returns_500(authed: AsyncClient):
     assert "Will fail" in titles, (
         "user message was lost when the LLM call failed"
     )
+
+
