@@ -78,6 +78,13 @@ def mock_qdrant(monkeypatch):
     monkeypatch.setattr(vs.VectorService, "__init__", fake_init)
     
     
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def _ensure_qdrant_collection():
+    from app.services.vector_service import get_vector_service
+    svc = get_vector_service()
+    await svc.ensure_collection()
+    yield
+    
     
 @pytest.fixture
 def mock_blacklist():
