@@ -63,23 +63,21 @@ def _assert_test_settings():
 
 @pytest.fixture(autouse=True)
 def mock_qdrant(monkeypatch):
-    """Replace Qdrant with an in-memory client so chat tests don't hit the network."""
-    from app.services.vector_service import VectorService
+    """Replace Qdrant with an in-memory client so tests don't need a Qdrant server."""
     from qdrant_client import AsyncQdrantClient
+    from qdrant_client.models import VectorParams, Distance
+    from app.services import vector_service as vs
+    from app.config import settings
 
-    async def fake_ensure(self):
-        if self.qdrant_client is None:
-            self.qdrant_client = AsyncQdrantClient(":memory:")
-            await self.qdrant_client.create_collection(
-                collection_name=self._collection,
-                vectors_config=__import__("qdrant_client.models", fromlist=["VectorParams"]).VectorParams(
-                    size=self._dims, distance=__import__("qdrant_client.models", fromlist=[
-                                                         "Distance"]).Distance.COSINE
-                ),
-            )
-        return self.qdrant_client
+    def fake_init(self):
+        self.qdrant_client = AsyncQdrantClient(":memory:")
+        self._collection = settings.QDRANT_COLLECTION_NAME
+        self._dims = settings.VECTOR_DIM
+        # Collection is created lazily — see `ensure_collection`
 
-    monkeypatch.setattr(VectorService, "_ensure_client", fake_ensure)
+    monkeypatch.setattr(vs.VectorService, "__init__", fake_init)
+    
+    
     
 @pytest.fixture
 def mock_blacklist():
