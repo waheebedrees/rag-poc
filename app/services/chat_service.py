@@ -147,7 +147,10 @@ class ChatService:
             )
         except ConversationNotFoundError as e:
             raise ChatError(str(e)) from e
-
+        
+    
+        # Fetch prior turns BEFORE persisting the new user message
+        history = await self.conv_service.get_recent_history(conversation.id, user_id)
         user_msg = Message(
             conversation_id=conversation.id,
             role=MessageRole.USER,
@@ -161,7 +164,6 @@ class ChatService:
         await self.db.commit()    
 
         #  everything below can fail without losing the question 
-        history = await self.conv_service.get_recent_history(conversation.id, user_id)
         query_text = self._build_query_text(message, history)
         query_embedding = await self.embedder.embed_one(query_text)
 
