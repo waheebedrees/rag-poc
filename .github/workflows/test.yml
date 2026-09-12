@@ -51,3 +51,12 @@ jobs:
           OPENAI_API_KEY: sk-test-fake
           GOOGLE_API_KEY: fake
           QDRANT_URL: http://localhost:6333
+
+
+
+      - name: Cache HuggingFace models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+          restore-keys: hf-${{ runner.os }}-
